@@ -32,3 +32,17 @@ app.get("/", (_req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`)
 })
+
+async function run() {
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+
+    
+  } finally {
+  }
+}
+run().catch(console.dir);
+
