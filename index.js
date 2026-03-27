@@ -39,14 +39,30 @@ async function run() {
 
     const skillsCollection = clientDB.db("skillhubDB").collection("skills");
     const usersCollection = clientDB.db("skillhubDB").collection("users");
+    await usersCollection.createIndex({ email: 1 }, { unique: true });
 
-    app.get("/users",async(req,res)=>{
-      const result=await usersCollection.find().toArray();
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
       res.send(result);
-    })
+    });
     app.post("/users", async (req, res) => {
-      const userInfo=req.body;
-      const result=await usersCollection.insertOne(userInfo);
+      const userInfo = req.body;
+
+      const result = await usersCollection.updateOne(
+        { email: userInfo.email },
+        {
+          $setOnInsert: {
+            email: userInfo.email,
+            creationTime: userInfo.creationTime,
+          },
+          $set: {
+            name: userInfo.displayName,
+            lastSignInTime: userInfo.lastSignInTime,
+          },
+        },
+        { upsert: true },
+      );
+
       res.send(result);
     });
 
