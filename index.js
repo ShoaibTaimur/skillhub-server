@@ -6,7 +6,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5050;
+const port = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
@@ -35,10 +35,21 @@ app.listen(port, () => {
 
 async function run() {
   try {
-    const clientDB= await client.connect();
+    const clientDB = await client.connect();
 
     const skillsCollection = clientDB.db("skillhubDB").collection("skills");
-    const userCollection = clientDB.db("skillhubDB").collection("users");
+    const usersCollection = clientDB.db("skillhubDB").collection("users");
+
+    app.get("/users",async(req,res)=>{
+      const result=await usersCollection.find().toArray();
+      res.send(result);
+    })
+    app.post("users", async (req, res) => {
+      const userInfo=req.body;
+      console.log(userInfo);
+      const result=await usersCollection.insertOne(userInfo);
+      res.send(result);
+    });
 
     app.get("/skills", async (req, res) => {
       const data = await skillsCollection.find().toArray();
